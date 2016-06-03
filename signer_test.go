@@ -31,11 +31,6 @@ var formParams = map[string]string{
 }
 
 func TestSignedBodyRequest(t *testing.T) {
-	_, err := SignedBodyRequest("http://example.com", "1234", "abcd", "")
-	if err == nil {
-		t.Error(`Error should be returned. Empty string passed in as body.`)
-	}
-
 	req, _ := SignedBodyRequest("http://example.com", "1234", "abcd", body)
 
 	if req.Header.Get("Authorization") == "" {
@@ -44,17 +39,9 @@ func TestSignedBodyRequest(t *testing.T) {
 }
 
 func TestBuildAuthHeader(t *testing.T) {
-	s := NewSigner("http://example.com", "1234", "abcd", "", nil)
-	_, err := s.BuildAuthHeader()
-	if err == nil {
-		t.Errorf(`BuildAuthHeader should of returned error.`)
-	}
+	s := NewSigner("http://example.com", "1234", "abcd", "test body", nil)
+	s.BuildAuthHeader()
 
-	if err.Error() != "No body provided" {
-		t.Errorf(`BuildAuthHeader should of returned error: "No body provided", instead got: %s`, err.Error())
-	}
-
-	s.Body = "test body"
 	h, _ := s.BuildAuthHeader()
 	if !strings.Contains(h, `OAuth realm=""`) {
 		t.Errorf(`BuildAuthHeader returned %s, expected: 'OAuth realm=""'`, h)

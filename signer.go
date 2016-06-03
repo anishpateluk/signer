@@ -120,10 +120,6 @@ type Signer struct {
 // For example: grade passback, this callback requires an XML body with the grade be passed back to the LTI
 // consumer with a signed authorization header.
 func (s Signer) BuildAuthHeader() (string, error) {
-	if len(s.Body) < 1 {
-		return "", errors.New("No body provided")
-	}
-
 	params := make(map[string]string)
 	s.addDefaultOAuthParams(params)
 
