@@ -31,7 +31,7 @@ var formParams = map[string]string{
 }
 
 func TestSignedBodyRequest(t *testing.T) {
-	req, _ := SignedBodyRequest("http://example.com", "1234", "abcd", body)
+	req, _ := SignedBodyRequest("", "http://example.com", "1234", "abcd", body)
 
 	if req.Header.Get("Authorization") == "" {
 		t.Errorf(`Authorization head does not exist.`)
@@ -39,7 +39,7 @@ func TestSignedBodyRequest(t *testing.T) {
 }
 
 func TestBuildAuthHeader(t *testing.T) {
-	s := NewSigner("http://example.com", "1234", "abcd", "test body", nil)
+	s := NewSigner("", "http://example.com", "1234", "abcd", "test body", nil)
 	s.BuildAuthHeader()
 
 	h, _ := s.BuildAuthHeader()
@@ -50,7 +50,7 @@ func TestBuildAuthHeader(t *testing.T) {
 
 func TestBodyHash(t *testing.T) {
 	hash := "8zvVCDnUBUsiOMVnRz9Ahc8bPWU="
-	s := NewSigner("http://example.com", "1234", "abcd", body, nil)
+	s := NewSigner("", "http://example.com", "1234", "abcd", body, nil)
 	genhash := s.bodyHash()
 
 	if genhash != hash {
@@ -135,7 +135,7 @@ func TestCreateBaseString(t *testing.T) {
 		"oauth_signature_method": "HMAC-SHA1",
 	}
 
-	s := Signer{URL: "http://example.com"}
+	s := Signer{Method: "POST", URL: "http://example.com"}
 
 	baseString := s.createBaseString(params)
 
@@ -156,6 +156,7 @@ func TestSignRequest(t *testing.T) {
 	}
 
 	s := Signer{
+		Method: "POST",
 		URL:    "http://example.com",
 		Secret: "secret",
 	}
@@ -177,7 +178,7 @@ func TestLTISign(t *testing.T) {
 
 	request, err := SignedFormRequest(ts.URL, "1000", "qwerty", formParams)
 	if err != nil {
-		t.Errorf(`Request failed to return: Request: %s Error: %s`, request, err)
+		t.Errorf(`Request failed to return: Request: %s Error: %s`, request, err.Error())
 	}
 
 	client := &http.Client{

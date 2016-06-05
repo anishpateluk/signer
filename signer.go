@@ -50,10 +50,14 @@ func ValidateSignature(url string, form url.Values, secret string) bool {
 }
 
 // SignedBodyRequest returns an http.Request with the body appended and a valid authorization header attached.
-func SignedBodyRequest(url string, key string, secret string, body string) (*http.Request, error) {
-	request, _ := http.NewRequest("POST", url, strings.NewReader(body))
+func SignedBodyRequest(method string, url string, key string, secret string, body string) (*http.Request, error) {
+	if method == "" {
+		method = "POST"
+	}
 
-	s := NewSigner(url, key, secret, body, nil)
+	request, _ := http.NewRequest(method, url, strings.NewReader(body))
+
+	s := NewSigner(method, url, key, secret, body, nil)
 
 	h, err := s.BuildAuthHeader()
 	if err != nil {
@@ -68,7 +72,7 @@ func SignedBodyRequest(url string, key string, secret string, body string) (*htt
 // SignedFormRequest is for creating a post request and correctly calculate the oAuth signature for LTI launches.
 // It takes in a key value string pair and returns an Request object for you to work with.
 func SignedFormRequest(url string, key string, secret string, params map[string]string) (*http.Request, error) {
-	s := NewSigner(url, key, secret, "", params)
+	s := NewSigner("POST", url, key, secret, "", params)
 
 	form, err := s.BuildAuthForm()
 	if err != nil {
@@ -86,8 +90,9 @@ func SignedFormRequest(url string, key string, secret string, params map[string]
 }
 
 // NewSigner returns a Signer struct
-func NewSigner(url string, key string, secret string, body string, form map[string]string) Signer {
+func NewSigner(method string, url string, key string, secret string, body string, form map[string]string) Signer {
 	return Signer{
+		Method: method,
 		URL:    url,
 		Body:   body,
 		Form:   form,
@@ -98,6 +103,8 @@ func NewSigner(url string, key string, secret string, body string, form map[stri
 
 // Signer represents the data needed to create a valid OAuth signed request for LTI
 type Signer struct {
+	// The HTTP method to be used in the request and signing
+	Method string
 
 	// URL is used in the request object returned and also used to generate
 	// a the base string for signature calculation.
@@ -190,7 +197,7 @@ func (s Signer) signRequest(params map[string]string) string {
 
 // createBaseString builds up a base string to be hashed and used as a signature.
 func (s Signer) createBaseString(params map[string]string) string {
-	baseString := "POST&" + escape(s.URL) + "&"
+	baseString := s.Method + "&" + escape(s.URL) + "&"
 
 	baseString = baseString + escape(s.escapeParams(params))
 
