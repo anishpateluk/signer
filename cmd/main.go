@@ -8,9 +8,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/dulldave/signer"
 	"github.com/satori/go.uuid"
-
-	"ghe.iparadigms.com/Integrations/Tool-Proxy-Registration.git/signer"
 )
 
 func ltiRequestExample() {
@@ -62,7 +61,7 @@ func jsonBodySignerExample() {
 	secret := "secret"
 	body := `{"outcomes_tool_placement_url":"https://api.turnitin.com/api/lti/1p0/outcome_tool_data/123456789?lang=en_us","paperid":"123456789","lis_result_sourcedid":"blah"}`
 
-	request, _ := signer.SignedBodyRequest(url, key, secret, body)
+	request, _ := signer.SignedBodyRequest("POST", url, key, secret, body)
 	request.Header.Add("Content-Type", "application/json")
 	client := &http.Client{
 		Timeout: 10 * time.Second,

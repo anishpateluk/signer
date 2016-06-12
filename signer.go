@@ -16,9 +16,8 @@ import (
 	"strings"
 	"time"
 
-	"ghe.iparadigms.com/Integrations/Signer/util"
-
 	log "github.com/Sirupsen/logrus"
+	"github.com/dulldave/signer/util"
 )
 
 // ValidateSignature takes the URL, params and secret and generates a signature. It then pulls the signature from the params

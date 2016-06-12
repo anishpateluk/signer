@@ -178,7 +178,7 @@ func TestLTISign(t *testing.T) {
 
 	request, err := SignedFormRequest(ts.URL, "1000", "qwerty", formParams)
 	if err != nil {
-		t.Errorf(`Request failed to return: Request: %s Error: %s`, request, err.Error())
+		t.Errorf(`Request failed to return. Error: %s`, err.Error())
 	}
 
 	client := &http.Client{
