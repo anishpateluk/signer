@@ -13,13 +13,14 @@ import (
 )
 
 func ltiRequestExample() {
+	key := "abc"
+	secret := "secret"
+	endpoint := "https://api.turnitin.com/api/lti/1p0/assignment"
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(r.Header)
 	}))
 	defer ts.Close()
-
-	endpoint := "http://ip-cpod3-vm1.oak.iparadigms.com:9002/api/lti/1p0/assignment"
 
 	resourceID := uuid.NewV4().String()
 	formParams := map[string]string{
@@ -40,7 +41,7 @@ func ltiRequestExample() {
 		"oauth_timestamp":                  strconv.Itoa(int(time.Now().Unix()))}
 
 	// Sign the request and add the auth header
-	request, err := signer.SignedFormRequest(endpoint, "61390", "testing1", formParams)
+	request, err := signer.SignedFormRequest(endpoint, key, secret, formParams)
 	if err != nil {
 		fmt.Println("Error signing request: ", err)
 	}
